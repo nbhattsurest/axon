@@ -16,7 +16,14 @@ import numpy as np
 import pytest
 from unittest.mock import MagicMock, call, patch
 
-from axon.core.embeddings.embedder import embed_graph, embed_nodes, EMBEDDABLE_LABELS, _get_model
+from axon.config.embeddings import reset_embedding_config
+from axon.core.embeddings.embedder import (
+    embed_graph,
+    embed_nodes,
+    EMBEDDABLE_LABELS,
+    _get_model,
+    _get_fastembed_model,
+)
 from axon.core.graph.graph import KnowledgeGraph
 from axon.core.graph.model import GraphNode, GraphRelationship, NodeLabel, RelType, generate_id
 from axon.core.storage.base import NodeEmbedding
@@ -24,10 +31,12 @@ from axon.core.storage.base import NodeEmbedding
 
 @pytest.fixture(autouse=True)
 def _clear_model_cache():
-    """Clear the lru_cache on _get_model before each test so mocks work."""
-    _get_model.cache_clear()
+    """Clear caches and reset config before each test so mocks work."""
+    _get_fastembed_model.cache_clear()
+    reset_embedding_config()
     yield
-    _get_model.cache_clear()
+    _get_fastembed_model.cache_clear()
+    reset_embedding_config()
 
 
 # ---------------------------------------------------------------------------

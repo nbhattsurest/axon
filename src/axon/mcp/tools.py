@@ -24,7 +24,6 @@ MAX_TRAVERSE_DEPTH = 10
 def _escape_cypher(value: str) -> str:
     """Escape a string for safe inclusion in a Cypher string literal."""
     return value.replace("\\", "\\\\").replace("'", "\\'")
-_EMBED_MODEL_NAME = "BAAI/bge-small-en-v1.5"
 
 
 def _confidence_tag(confidence: float) -> str:
@@ -183,10 +182,11 @@ def handle_query(storage: StorageBackend, query: str, limit: int = 20) -> str:
     """
     query_embedding: list[float] | None = None
     try:
-        from axon.core.embeddings.embedder import _get_model
+        from axon.core.embeddings.embedder import _get_model, _to_list
 
-        model = _get_model(_EMBED_MODEL_NAME)
-        query_embedding = list(next(iter(model.embed([query]))))
+        model = _get_model()
+        embedding = next(iter(model.embed([query])))
+        query_embedding = _to_list(embedding)
     except Exception:
         logger.debug("Query embedding failed, falling back to FTS only", exc_info=True)
 
