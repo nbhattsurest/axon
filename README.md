@@ -520,6 +520,62 @@ The storage layer is abstracted behind a `StorageBackend` Protocol — KuzuDB is
 
 ---
 
+## Embedding Configuration
+
+Axon supports multiple embedding providers for semantic search:
+
+### FastEmbed (Default)
+
+Uses local ONNX-based embeddings via [fastembed](https://github.com/qdrant/fastembed). No API keys required — runs entirely offline.
+
+```bash
+# Default model: BAAI/bge-small-en-v1.5 (384 dimensions)
+axon analyze .
+
+# Use a different model
+export FASTEMBED_MODEL=BAAI/bge-base-en-v1.5
+axon analyze .
+```
+
+### Azure OpenAI (via UAIS)
+
+For enterprise environments using UHG's UAIS (United AI Studio), Axon can use Azure OpenAI embeddings. Install the optional dependencies first:
+
+```bash
+pip install axoniq[azure-openai]
+```
+
+Then configure via environment variables:
+
+```bash
+# Required: Switch to Azure OpenAI provider
+export AXON_EMBEDDING_PROVIDER=azure_openai
+
+# Required: UAIS credentials
+export UAIS_CLIENT_ID=your-client-id
+export UAIS_CLIENT_SECRET=your-client-secret
+
+# Optional: Override defaults
+export AZURE_OPENAI_ENDPOINT=https://api.uhg.com/api/azureopenai
+export AZURE_OPENAI_EMBEDDING_MODEL=text-embedding-ada-002
+export AZURE_OPENAI_API_VERSION=2024-02-01
+
+# Run indexing
+axon analyze .
+```
+
+| Environment Variable | Default | Description |
+|---------------------|---------|-------------|
+| `AXON_EMBEDDING_PROVIDER` | `fastembed` | Provider: `fastembed` or `azure_openai` |
+| `FASTEMBED_MODEL` | `BAAI/bge-small-en-v1.5` | FastEmbed model name |
+| `UAIS_CLIENT_ID` | -- | UAIS OAuth2 client ID |
+| `UAIS_CLIENT_SECRET` | -- | UAIS OAuth2 client secret |
+| `AZURE_OPENAI_ENDPOINT` | `https://api.uhg.com/api/azureopenai` | Azure OpenAI endpoint |
+| `AZURE_OPENAI_EMBEDDING_MODEL` | `text-embedding-ada-002` | Embedding model name |
+| `AZURE_OPENAI_API_VERSION` | `2024-02-01` | API version |
+
+---
+
 ## Development
 
 ```bash
