@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 
 from axon.core.graph.graph import KnowledgeGraph
-from axon.core.graph.model import NodeLabel, RelType, generate_id, GraphNode
+from axon.core.graph.model import GraphNode, NodeLabel, RelType, generate_id
 from axon.core.ingestion.parser_phase import (
     FileParseData,
     get_parser,
@@ -13,9 +13,9 @@ from axon.core.ingestion.parser_phase import (
     process_parsing,
 )
 from axon.core.ingestion.walker import FileEntry
+from axon.core.parsers.java_lang import JavaParser
 from axon.core.parsers.python_lang import PythonParser
 from axon.core.parsers.typescript import TypeScriptParser
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -86,6 +86,18 @@ function add(a, b) {
 }
 """
 
+JAVA_CODE = """\
+public class UserService {
+    public User getUser(int userId) {
+        return db.findById(userId);
+    }
+
+    private void validate(User user) {
+        user.checkValid();
+    }
+}
+"""
+
 
 def _make_file_entry(
     path: str, content: str, language: str
@@ -122,6 +134,14 @@ class TestGetParserJavaScript:
         parser = get_parser("javascript")
         assert isinstance(parser, TypeScriptParser)
         assert parser.dialect == "javascript"
+
+
+class TestGetParserJava:
+    """get_parser returns JavaParser for 'java'."""
+
+    def test_get_parser_java(self) -> None:
+        parser = get_parser("java")
+        assert isinstance(parser, JavaParser)
 
 
 class TestGetParserUnsupported:
@@ -174,6 +194,28 @@ class TestParseFileTypeScript:
         assert "Config" in symbol_names
         assert "App" in symbol_names
         assert "run" in symbol_names
+
+
+class TestParseFileJava:
+    """parse_file parses Java source and returns correct symbols."""
+
+    def test_parse_file_java(self) -> None:
+        data = parse_file("src/UserService.java", JAVA_CODE, "java")
+
+        assert isinstance(data, FileParseData)
+        assert data.file_path == "src/UserService.java"
+        assert data.language == "java"
+
+        symbol_names = [s.name for s in data.parse_result.symbols]
+        assert "UserService" in symbol_names
+        assert "getUser" in symbol_names
+        assert "validate" in symbol_names
+
+    def test_method_has_class_name(self) -> None:
+        data = parse_file("src/UserService.java", JAVA_CODE, "java")
+        methods = [s for s in data.parse_result.symbols if s.kind == "method"]
+        for m in methods:
+            assert m.class_name == "UserService"
 
 
 # ---------------------------------------------------------------------------

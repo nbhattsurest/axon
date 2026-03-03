@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from axon.config.ignore import (
     DEFAULT_IGNORE_PATTERNS,
     load_gitignore,
@@ -16,7 +14,6 @@ from axon.config.languages import (
     get_language,
     is_supported,
 )
-
 
 # ---------------------------------------------------------------------------
 # ignore.py tests
@@ -168,6 +165,9 @@ class TestGetLanguage:
     def test_accepts_path_object(self) -> None:
         assert get_language(Path("src/app.py")) == "python"
 
+    def test_java(self) -> None:
+        assert get_language("Service.java") == "java"
+
 
 class TestIsSupported:
     """Tests for is_supported()."""
@@ -177,6 +177,9 @@ class TestIsSupported:
 
     def test_supported_ts(self) -> None:
         assert is_supported("app.ts") is True
+
+    def test_supported_java(self) -> None:
+        assert is_supported("Service.java") is True
 
     def test_not_supported_md(self) -> None:
         assert is_supported("README.md") is False

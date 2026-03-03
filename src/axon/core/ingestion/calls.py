@@ -22,7 +22,11 @@ from axon.core.graph.model import (
     generate_id,
 )
 from axon.core.ingestion.parser_phase import FileParseData
-from axon.core.ingestion.symbol_lookup import build_file_symbol_index, build_name_index, find_containing_symbol
+from axon.core.ingestion.symbol_lookup import (
+    build_file_symbol_index,
+    build_name_index,
+    find_containing_symbol,
+)
 from axon.core.parsers.base import CallInfo
 
 logger = logging.getLogger(__name__)
@@ -74,6 +78,16 @@ _CALL_BLOCKLIST: frozenset[str] = frozenset({
     "useState", "useEffect", "useRef", "useCallback", "useMemo",
     "useContext", "useReducer", "useLayoutEffect", "useImperativeHandle",
     "useDebugValue", "useId", "useTransition", "useDeferredValue",
+    # Java built-in classes and methods
+    "System", "out", "println", "printf",
+    "String", "Integer", "Long", "Double", "Float", "Boolean", "Character",
+    "StringBuilder", "StringBuffer",
+    "ArrayList", "HashMap", "HashSet", "LinkedList", "TreeMap", "TreeSet",
+    "Collections", "Arrays",
+    "Optional", "Stream", "Collectors",
+    "equals", "hashCode", "toString", "compareTo", "clone",
+    "length", "size", "isEmpty", "contains", "add", "remove", "clear",
+    "charAt", "substring", "indexOf", "lastIndexOf", "trim", "toUpperCase", "toLowerCase",
 })
 
 def resolve_call(
