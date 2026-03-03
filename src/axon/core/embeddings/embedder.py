@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import logging
 from functools import lru_cache
-from typing import TYPE_CHECKING, Iterator, Protocol, Union
+from typing import TYPE_CHECKING, Any, Iterator, Protocol
 
 from axon.config.embeddings import EmbeddingProvider, get_embedding_config
 from axon.core.embeddings.text import build_class_method_index, generate_text
@@ -53,7 +53,7 @@ def _get_fastembed_model(model_name: str) -> "TextEmbedding":
     return TextEmbedding(model_name=model_name)
 
 
-def _get_model(model_name: str | None = None) -> Union["TextEmbedding", "AzureOpenAIEmbedder"]:
+def _get_model(model_name: str | None = None) -> "TextEmbedding | AzureOpenAIEmbedder":
     """Get the appropriate embedding model based on configuration.
 
     Args:
@@ -87,10 +87,16 @@ EMBEDDABLE_LABELS: frozenset[NodeLabel] = frozenset(
     }
 )
 
-def _to_list(vector) -> list[float]:
+def _to_list(vector: Any) -> list[float]:
     """Convert embedding vector to a plain Python list.
 
     Handles both numpy arrays (from FastEmbed) and lists (from Azure OpenAI).
+
+    Args:
+        vector: Embedding vector (numpy array or list).
+
+    Returns:
+        Plain Python list of floats.
     """
     if hasattr(vector, "tolist"):
         return vector.tolist()

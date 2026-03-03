@@ -21,6 +21,8 @@ from functools import lru_cache
 from typing import TYPE_CHECKING, Iterator
 
 if TYPE_CHECKING:
+    from openai import AzureOpenAI
+
     from axon.config.embeddings import EmbeddingConfig
 
 logger = logging.getLogger(__name__)
@@ -100,7 +102,7 @@ class AzureOpenAIEmbedder:
         self.config = config
         self._client = None
 
-    def _get_client(self):
+    def _get_client(self) -> "AzureOpenAI":
         """Get or create the OpenAI client with current token."""
         from openai import AzureOpenAI
 
