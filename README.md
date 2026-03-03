@@ -123,6 +123,7 @@ Not just "zero callers" — a multi-pass analysis that understands your framewor
 Detects entry points using framework-aware patterns:
 - **Python**: `@app.route`, `@router.get`, `@click.command`, `test_*` functions, `__main__` blocks
 - **JavaScript/TypeScript**: Express handlers, exported functions, `handler`/`middleware` patterns
+- **Java**: Spring Boot annotations (`@RequestMapping`, `@GetMapping`, etc.), JAX-RS annotations (`@Path`, `@GET`, etc.), Servlet methods (`doGet`, `doPost`)
 
 Then traces BFS execution flows from each entry point through the call graph, classifying flows as intra-community or cross-community.
 
@@ -299,6 +300,7 @@ impact  -> "Tip: Review each affected symbol before making changes."
 | Python | `.py` | tree-sitter-python |
 | TypeScript | `.ts`, `.tsx` | tree-sitter-typescript |
 | JavaScript | `.js`, `.jsx`, `.mjs`, `.cjs` | tree-sitter-javascript |
+| Java | `.java` | tree-sitter-java |
 
 ---
 
@@ -449,7 +451,7 @@ Examples:
 ## Architecture
 
 ```
-Source Code (.py, .ts, .js, .tsx, .jsx)
+Source Code (.py, .ts, .js, .tsx, .jsx, .java)
     |
     v
 +----------------------------------------------+

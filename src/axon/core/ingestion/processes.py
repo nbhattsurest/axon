@@ -115,6 +115,18 @@ def _matches_framework_pattern(node: GraphNode) -> bool:
         if node.is_exported:
             return True
 
+    if language == "java" or node.file_path.endswith(".java"):
+        if name == "main":
+            return True
+        # Spring Boot, JAX-RS, Servlet entry points
+        for pattern in ("@RequestMapping", "@GetMapping", "@PostMapping",
+                        "@PutMapping", "@DeleteMapping", "@PatchMapping",
+                        "@Path", "@GET", "@POST", "@PUT", "@DELETE",
+                        "doGet", "doPost", "doPut", "doDelete",
+                        "@Scheduled", "@EventListener"):
+            if pattern in content:
+                return True
+
     return False
 
 def trace_flow(
